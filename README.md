@@ -3,7 +3,7 @@
 
 ### Installation
 ```
-npm i @rezemble/api-factory
+npm i @seepdea/api-factory
 ```
 
 ### Usage
