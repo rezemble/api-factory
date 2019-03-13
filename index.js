@@ -91,7 +91,7 @@ const APIFactory = (fn) => {
                 return option;
             }
           }));
-        case 'HEADERS':
+        case '_HEADERS':
           return (headers, extend=true) => API(...options.map(option => {
             switch(typeof option) {
               case 'object':
@@ -106,12 +106,12 @@ const APIFactory = (fn) => {
                 return option;
             }
           }));
-        case 'QUERY':
-          return API(...options.some(option => typeof option === 'string')
-            ? options.map(option => typeof option === 'string' ? patchQuery(option, p) : option)
+        case '_QUERY':
+          return (query) => API(...options.some(option => typeof option === 'string')
+            ? options.map(option => typeof option === 'string' ? patchQuery(option, query) : option)
             : options.map(option => typeof option === 'object' ? {
               ...option,
-              [typeof option.uri !== 'undefined' ? 'uri' : 'url']: patchQuery(option.url||option.uri||'', p),
+              [typeof option.uri !== 'undefined' ? 'uri' : 'url']: patchQuery(option.url||option.uri||'', query),
             } : option));
 
         default:
