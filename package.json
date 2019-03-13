@@ -1,0 +1,19 @@
+{
+  "name": "api-factory",
+  "version": "1.0.0",
+  "description": "Make traversible JS representation of a remote resource",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rezemble/api-factory.git"
+  },
+  "keywords": [
+    "api"
+  ],
+  "author": "luthor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rezemble/api-factory/issues"
+  },
+  "homepage": "https://github.com/rezemble/api-factory#readme"
+}
