@@ -7,13 +7,13 @@ npm i rezemble/api-factory
 ```
 
 ### Usage
-```
+```javascript
 const APIFactory = require('api-factory')
 ```
 APIFactory takes a function that returns a promise as an argument, such as `fetch` and returns a wrapped Proxy Function.
 
 #### In Node
-```
+```javascript
 const request = require('request-promise-native')
 
 const API = APIFactory(request)
@@ -62,7 +62,7 @@ await subPath._POST({
 
 #### In Browser
 
-```
+```javascript
 const API = APIFactory(fetch)
 
 const exampleAPI = API('https://example.com', { // pass parameters as you would to fetch

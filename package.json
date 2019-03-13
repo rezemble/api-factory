@@ -1,5 +1,5 @@
 {
-  "name": "api-factory",
+  "name": "@seepdea/api-factory",
   "version": "1.0.0",
   "description": "Make traversible JS representation of a remote resource",
   "main": "index.js",
