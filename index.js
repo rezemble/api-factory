@@ -132,7 +132,7 @@ const APIFactory = (fn) => {
             ...arg,
           };
         }
-        return arg;
+        return option;
       }));
     },
   });
