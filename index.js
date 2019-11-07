@@ -13,7 +13,35 @@ const patchQuery = (url, query={}) => {
 };
 
 const APIFactory = (fn) => {
+  class ApiOptions {
+    chains = []
+    constructor({ chains = [] }) {
+      this.chains = chains || []
+    }
+    setOption(name, value) {
+      return new ApiOptions({
+        [name]: value,
+      })
+    }
+    chain(...f) {
+      return this.setOption('chains', [
+        ...this.chains,
+        ...f,
+      ])
+    }
+  }
   const API = (...options) => new Proxy((...d) => fn(...d), {
+    options: new ApiOptions({}),
+    setOptions(options) {
+      this.options = options
+    },
+    run(target, ...options) {
+      let last = target(...options)
+      for (const fn of this.options.chains) {
+        last = last.then(fn)
+      }
+      return last;
+    },
     ownKeys(target) {
       return ['__url', '__method', '__headers', 'prototype'];
     },
@@ -34,13 +62,13 @@ const APIFactory = (fn) => {
     get(target, p) {
       switch(p) {
         case 'then':
-          return (...d) => target(...options).then(...d);
+          return (...d) => this.run(target, ...options).then(...d);
         case 'finally':
-          return (...d) => target(...options).finally(...d);
+          return (...d) => this.run(target, ...options).finally(...d);
         case 'catch':
-          return (...d) => target(...options).catch(...d);
+          return (...d) => this.run(target, ...options).catch(...d);
         case '_rp_promise':
-          return target(...options);
+          return this.run(target, ...options);
         case Symbol.toStringTag:
           return `${options.method||'GET'}: ${options.uri}`;
         case Symbol.iterator:
@@ -79,6 +107,14 @@ const APIFactory = (fn) => {
                 return option;
             }
           }));
+        case '_API_OPTIONS':
+          return this.setOptions.bind(this);
+        case '_CHAIN':
+          return (...fn) => {
+            const api = API(options);
+            api._API_OPTIONS(this.options.chain(...fn));
+            return api;
+          }
         case '_METHOD':
           return (method='GET') => API(...options.map(option => {
             switch(typeof option) {
