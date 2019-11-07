@@ -43,6 +43,7 @@ exampleAPI.__method // GET
 exampleAPI._POST.__method // POST
 exampleAPI._METHOD('POST').__method // POST
 
+
 // to run requests, use the API instance like you would a promise:
 exampleAPI.then(res => /* doSomething */).catch(...)
 await exampleAPI // result of request
@@ -70,6 +71,10 @@ const exampleAPI = API('https://example.com', { // pass parameters as you would 
         'Authorization': `Bearer ${token}`,
     },
 })
+
+// promise handlers can be changed
+const jsonAPI = exampleAPI._CHAIN(d => d.json())
+// every call on jsonAPI will now be processed with `d => d.json()`
 
 // the following sets up a POST end point to https://example.com/some/sub/path
 // with added Content-Type header
