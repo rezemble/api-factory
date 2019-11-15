@@ -110,7 +110,7 @@ const APIFactory = (fn) => {
           return this.setOptions.bind(this);
         case '_CHAIN':
           return (...fn) => {
-            const api = API(options);
+            const api = API(...options);
             api._API_OPTIONS(this.options.chain(...fn));
             return api;
           }
