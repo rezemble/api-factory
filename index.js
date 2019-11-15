@@ -95,17 +95,21 @@ const APIFactory = (fn) => {
         case '_DELETE':
         case '_OPTIONS':
         case '_TRACE':
-          return API(...options.map(option => {
-            switch(typeof option) {
-              case 'object':
-                return {
-                  ...option,
-                  method: p.slice(1),
-                };
-              default:
-                return option;
-            }
-          }));
+          {
+            const api = API(...options.map(option => {
+              switch(typeof option) {
+                case 'object':
+                  return {
+                    ...option,
+                    method: p.slice(1),
+                  };
+                default:
+                  return option;
+              }
+            }));
+            api._API_OPTIONS(this.options);
+            return api;
+          }
         case '_API_OPTIONS':
           return this.setOptions.bind(this);
         case '_CHAIN':
@@ -115,51 +119,66 @@ const APIFactory = (fn) => {
             return api;
           }
         case '_METHOD':
-          return (method='GET') => API(...options.map(option => {
-            switch(typeof option) {
-              case 'object':
-                return {
-                  ...option,
-                  method,
-                };
-              default:
-                return option;
-            }
-          }));
+          return (method='GET') => {
+            const api = API(...options.map(option => {
+              switch(typeof option) {
+                case 'object':
+                  return {
+                    ...option,
+                    method,
+                  };
+                default:
+                  return option;
+              }
+            }));
+            api._API_OPTIONS(this.options);
+            return api;
+          }
         case '_HEADERS':
-          return (headers, extend=true) => API(...options.map(option => {
-            switch(typeof option) {
-              case 'object':
-                return {
-                  ...option,
-                  headers: {
-                    ...(extend?option.headers||{}:{}),
-                    ...(headers||{}),
-                  },
-                };
-              default:
-                return option;
-            }
-          }));
+          return (headers, extend=true) => {
+            const api = API(...options.map(option => {
+              switch(typeof option) {
+                case 'object':
+                  return {
+                    ...option,
+                    headers: {
+                      ...(extend?option.headers||{}:{}),
+                      ...(headers||{}),
+                    },
+                  };
+                default:
+                  return option;
+              }
+            }));
+            api._API_OPTIONS(this.options);
+            return api;
+          }
         case '_QUERY':
-          return (query) => API(...options.some(option => typeof option === 'string')
-            ? options.map(option => typeof option === 'string' ? patchQuery(option, query) : option)
-            : options.map(option => typeof option === 'object' ? {
-              ...option,
-              [typeof option.uri !== 'undefined' ? 'uri' : 'url']: patchQuery(option.url||option.uri||'', query),
-            } : option));
-
+          return (query) => {
+            const api = API(...options.some(option => typeof option === 'string')
+              ? options.map(option => typeof option === 'string' ? patchQuery(option, query) : option)
+              : options.map(option => typeof option === 'object' ? {
+                ...option,
+                [typeof option.uri !== 'undefined' ? 'uri' : 'url']: patchQuery(option.url||option.uri||'', query),
+              } : option));
+            api._API_OPTIONS(this.options);
+            return api;
+          }
         default:
-          return API(...options.some(option => typeof option === 'string')
-            ? options.map(option => typeof option === 'string' ? patch(option||'', p) : option)
-            : options.map(option => typeof option === 'object' ? {
-              ...option,
-              [typeof option.uri !== 'undefined' ? 'uri' : 'url']: patch(option.url||option.uri||'', p),
-            } : option));
+          {
+            const api = API(...options.some(option => typeof option === 'string')
+              ? options.map(option => typeof option === 'string' ? patch(option||'', p) : option)
+              : options.map(option => typeof option === 'object' ? {
+                ...option,
+                [typeof option.uri !== 'undefined' ? 'uri' : 'url']: patch(option.url||option.uri||'', p),
+              } : option));
+            api._API_OPTIONS(this.options);
+            return api;
+          }
       }
     },
     apply(target, that, args) {
-      return API(...options.map(option => {
+      const api = API(...options.map(option => {
         let arg = args.find(arg => typeof arg === typeof option);
         if (arg && typeof option === 'object') {
           return {
@@ -169,6 +188,8 @@ const APIFactory = (fn) => {
         }
         return arg || option;
       }));
+      api._API_OPTIONS(this.options);
+      return api;
     },
   });
   return API;
