@@ -14,7 +14,6 @@ const patchQuery = (url, query={}) => {
 
 const APIFactory = (fn) => {
   class ApiOptions {
-    chains = []
     constructor({ chains = [] }) {
       this.chains = chains || []
     }
